@@ -4,6 +4,8 @@ import HttpStatus from 'http-status';
 
 import PLANETS from '../data/planets.js';
 
+import planetsRepository from '../repositories/planets.repository.js';
+
 const router = express.Router();
 
 class PlanetsRoutes {
@@ -17,6 +19,27 @@ class PlanetsRoutes {
         router.put('/:idPlanet', this.put);
     }
 
+    async getOne(req, res, next) {
+        const idPlanet = req.params.idPlanet;
+    
+        try {
+            const planet = await planetsRepository.retrieveById(idPlanet);
+            
+            if(!planet) {
+                //2. La planète existe pas = 404 - Not Found
+                return next(HttpError.NotFound(`La planète avec le id ${idPlanet} n'existe pas.`));
+            } else {
+                //1. La planète existe = 200 - OK
+                res.status(200).json(planet); //Content-Type et send la response
+            }
+            
+        } catch(err) {
+            return next(err);
+        }
+
+    }
+
+
     patch(req, res, next) {
         return next(HttpError.NotImplemented());
     }
@@ -25,28 +48,24 @@ class PlanetsRoutes {
         return next(HttpError.NotImplemented());
     }
 
-    getAll(req, res, next) {
-        res.status(HttpStatus.OK);
-        res.set('Content-Type', 'application/json');
+    async getAll(req, res, next) {
 
-        res.send(PLANETS);
-    }
-
-    getOne(req, res, next) {
-        const idPlanet = req.params.idPlanet;
-        
-        const planet = PLANETS.find(p => p.id == idPlanet);
-        console.log(planet); 
-        
-        if(!planet) {
-            //2. La planète existe pas = 404 - Not Found
-            return next(HttpError.NotFound(`La planète avec le id ${idPlanet} n'existe pas.`));
-        } else {
-            //1. La planète existe = 200 - OK
-            res.status(200).json(planet); //Content-Type et send la response
+        const filter = {};
+        if(req.query.explorer) {
+            filter.discoveredBy = req.query.explorer;
         }
 
+        try {
+
+           const planets = await planetsRepository.retrieveAll(filter);
+           res.status(200).json(planets);     
+
+        } catch(err) {
+            return next(err);
+        }
     }
+
+    
 
     post(req, res, next) {
         const newPlanet = req.body;
