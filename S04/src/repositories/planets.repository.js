@@ -1,6 +1,8 @@
 
 import Planet from '../models/planet.model.js';
 
+const ZERO_KELVIN = -273.15;
+
 class PlanetsRepository {
 
     retrieveById(idPlanet) {
@@ -24,6 +26,31 @@ class PlanetsRepository {
         //WHERE discoveredBy = 'Skadex' OR temperature > 240
 
         return Planet.find(filter);
+    }
+
+    create(planet) {
+        return Planet.create(planet);
+    }
+
+    delete(idPlanet) {
+        return Planet.findByIdAndDelete(idPlanet);
+    }
+
+    transform(planet, transformOptions = {}) {
+
+        if(transformOptions.unit) {
+            switch(transformOptions.unit) {
+                case 'c':
+                    planet.temperature += ZERO_KELVIN;
+                    planet.temperature = parseFloat(planet.temperature.toFixed(2));
+                    break;
+            }
+        }
+
+        delete planet.__v;
+
+        return planet;
+
     }
 }
 
