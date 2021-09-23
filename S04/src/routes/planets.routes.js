@@ -96,6 +96,9 @@ class PlanetsRoutes {
         const newPlanet = req.body;
 
         //TODO: Validation rapide jusqu'à la semaine +/- 8
+        if(Object.keys(newPlanet).length === 0) {
+            return next(HttpError.BadRequest('La planète ne peut pas pas être vide'));
+        }
 
         try {
             
@@ -130,8 +133,26 @@ class PlanetsRoutes {
        
     }
 
-    patch(req, res, next) {
-        return next(HttpError.NotImplemented());
+    async patch(req, res, next) {
+        const planetModifs = req.body;
+
+        try {
+             
+            let planet = await planetsRepository.update(req.params.idPlanet, planetModifs);
+
+            if(!planet) {
+                return next(HttpError.NotFound(`La planète avec le id ${req.params.idPlanet} n'existe pas.`));
+            }
+
+            planet = planet.toObject({getters: false, virtuals:false});
+            planet = planetsRepository.transform(planet);
+
+            res.status(200).json(planet);
+
+        } catch(err) {
+            return next(err);
+        }
+
     }
 
     put(req, res, next) {
