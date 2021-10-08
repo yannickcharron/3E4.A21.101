@@ -13,8 +13,20 @@ const urlParams = {};
 
 $(document).ready(() => {
     getPlanet(urlParams.planet);
+
+    $('#btnAddPortal').click(() => {
+        addPortal();
+    })
+
 });
 
+function addPortal() {
+    const position = $('#txtPosition').val();
+    const affinity = $('#cboAffinity').val();
+
+    console.log(position);
+    console.log(affinity);
+}
 
 async function getPlanet(url) {
     const response = await axios.get(url); 
@@ -28,6 +40,37 @@ async function getPlanet(url) {
         $('#lblDiscoveryDate').html(planet.discoveryDate);
         $('#lblTemperature').html(planet.temperature);
         const position = `(${planet.position.x.toFixed(3)} ; ${planet.position.y.toFixed(3)} ; ${planet.position.z.toFixed(3)})`;
-        $('#lblPosition').html(position); 
+        $('#lblPosition').html(position);
+        
+        //Satellites
+        if(planet.satellites.length > 0) {
+            let satellitesHtml = '';
+            planet.satellites.forEach(s => {
+                satellitesHtml += `<li>${s}</li>`;
+            });
+            $('#satellites').html(satellitesHtml);
+        } else {
+            $('#satellites').html('<li>Aucun satellite</li>');
+        }
+
+        displayPortals(planet.portals);
+
     }
+}
+
+function displayPortals(portals) {
+
+    let portalsHtml = '';
+    
+    portals.forEach(p => {
+        portalsHtml += '<tr>'
+        portalsHtml += `<td>${p.position}</td>`;
+        portalsHtml += `<td><img src="img/${p.affinity}.png" title="${p.affinity}" /></td>`;
+        //3. Dans chaque tr --> 2 td (position, affinity)
+        portalsHtml += '</tr>'
+    }); 
+
+    
+    $('#portals tbody').html(portalsHtml);
+    //4. Ajouter la chaine dans la page
 }
