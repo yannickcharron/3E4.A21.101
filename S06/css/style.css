@@ -16,6 +16,11 @@ a:link, a:visited {
     color: black;
 }
 
+.element {
+    width: 20%;
+    height: auto;
+}
+
 #imgIcon {
     width: 128px;
     height: auto;
