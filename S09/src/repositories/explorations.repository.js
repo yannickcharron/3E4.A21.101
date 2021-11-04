@@ -23,7 +23,6 @@ class ExplorationsRepository {
 
     transform(exploration, transformOptions = {}) {
 
-        
         if(transformOptions.embed && transformOptions.embed.planet) {
             //?embed=planet
             //exploration.planet => un objet complet
@@ -39,6 +38,7 @@ class ExplorationsRepository {
         exploration.href = `/explorations/${exploration._id}`;
         
         delete exploration._id;
+        delete exploration.id;
 
         return exploration;
     }
